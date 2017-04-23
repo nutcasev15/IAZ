@@ -1,0 +1,21 @@
+# SAMPLE
+
+run_program("/sbin/busybox", "umount", "/system");
+run_program("/sbin/busybox", "mount", "/system");
+show_progress(0.100000, 0);
+
+ui_print("-----------------------");
+ui_print("My ROM's Apps");
+ui_print("-----------------------");
+show_progress(0.800000, 0);
+
+ui_print("----------------");
+ui_print("Installing");
+ui_print("----------------");
+package_extract_dir("system", "/system");
+
+ui_print("----");
+ui_print("Applications were succesfully installed");
+ui_print("----");
+run_program("/sbin/busybox", "umount", "/system");
+show_progress(1.000000, 0);
