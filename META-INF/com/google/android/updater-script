@@ -1,0 +1,19 @@
+mount("ext4", "EMMC", "/dev/block/by-name/system", "/system");
+ui_print("Start Flash");
+show_progress(0.100000, 0);
+
+ui_print("-----------------------");
+ui_print("My Apps");
+ui_print("-----------------------");
+show_progress(0.800000, 0);
+
+ui_print("----------------");
+ui_print("Installing");
+ui_print("----------------");
+package_extract_dir("system", "/system");
+
+ui_print("----");
+ui_print("Patching Complete");
+ui_print("----");
+show_progress(1.000000, 0);
+unmount("/system");
