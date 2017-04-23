@@ -1,0 +1,56 @@
+# Integrated App Zipper
+# Environment Variables
+DEVICE_MODEL=<yourmodel>
+ROM=<yourrom>
+BREAKFAST=n
+JBS=16
+SYSDIR=$(find out -type d -name "system" | grep $DEVICE_MODEL)
+DATE=$(date +"%m%d%Y")
+# Export PONLY in ROM Src ROOT for Zipping only
+# Begin
+
+# Packing Method
+pack(){
+cp -ar $SYSDIR tools/IAZ
+cd tools/IAZ
+find . -type f -exec zip "$ROM"_AppSuite_"$DATE".zip {} +
+rm -rf system
+cd ../..
+mv tools/IAZ/"$ROM"_AppSuite_"$DATE".zip ../"$ROM"_AppSuite_"$DATE".zip
+}
+
+# Da Script
+printf "######### Command Acknowledged #########\n"
+if [[ -z "$PONLY" ]]
+then
+	printf "\n######### Setting Up Environtment #########\n"
+	printf "\n######### Updating App Sources #########\n"
+	repo sync -qj$JBS
+	printf "\n######### Done Syncing #########\n"
+	. build/envsetup.sh
+	if [[ "$BREAKFAST" == "n" ]]
+	then
+		lunch $DEVICE_MODEL
+	else
+		breakfast $DEVICE_MODEL
+	fi
+	# Builtin List of Apps
+	make clean
+	mka -j$JBS \
+	<app1> \
+	<app2> \
+	. \
+	. \
+	. \
+	. \
+	.
+	printf "######### Apps Compiled #########"
+	pack
+	printf "######### Zip Compiled #########"
+else
+	pack
+	printf "######### Zip Compiled #########"
+fi
+
+unset DEVICE_MODEL ROM BREAKFAST JBS SYSDIR DATE
+# End
