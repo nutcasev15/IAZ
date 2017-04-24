@@ -13,6 +13,7 @@ DATE=$(date +"%m%d%Y")
 pack(){
 cp -ar $SYSDIR tools/IAZ
 cd tools/IAZ
+chmod -R 644 system
 find . -type f -exec zip "$ROM"_AppSuite_"$DATE".zip {} +
 rm -rf system
 cd ../..
