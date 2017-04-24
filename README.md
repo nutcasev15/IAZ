@@ -6,7 +6,7 @@ The Scripts Use DEVICE_MODEL variable to setup the Environment & compile apps.<b
 
 # Setup
 - Add the following line to your manifest: <br>
-<code>\<project name="nutcasev15/IAZ" path="tools/IAZ" remote="github" revision="Template" /\></code><br>
+<code>\<project name="nutcasev15/IAZ" path="tools/IAZ" remote="github" revision="Template_x86" /\></code><br>
 - Customize the Updater-Binary, Device Model Info & Lunch/Breakfast support in the IAZ Script
 - Add a Predefined List of Apps to Compile in IAZ Script
 - Commit Changes
