@@ -1,9 +1,9 @@
 # Integrated App Zipper
 # Environment Variables
-DEVICE_MODEL=<yourmodel>
-ROM=<yourrom>
-BREAKFAST=n
-JBS=22
+DEVICE_MODEL=Z00A
+ROM=Lineage
+BREAKFAST=y
+JBS=24
 DATE=$(date +"%m%d%y")
 export ROM_ROOT=$PWD
 export SYSDIR="out/target/product/$DEVICE_MODEL/system"
