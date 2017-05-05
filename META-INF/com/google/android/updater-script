@@ -5,12 +5,24 @@ show_progress(0.100000, 0);
 ui_print("-----------------------");
 ui_print("Made By IAZ");
 ui_print("-----------------------");
-show_progress(0.400000, 0);
+show_progress(0.200000, 0);
 
 ui_print("----------------");
 ui_print("Installing Lineage_AppSuite");
 ui_print("----------------");
+
+ui_print("Patching AOSP Apps");
 package_extract_dir("system", "/system");
+show_progress(0.400000, 0);
+ui_print("----------------");
+ui_print("Calendar");
+ui_print("Email");
+ui_print("PacProcessor");
+ui_print("EasterEgg");
+ui_print("Gallery2");
+ui_print("----------------");
+show_progress(0.600000, 0);
+ui_print("Patched Lineage Apps [Not Done By Mini Zip]");
 show_progress(0.800000, 0);
 
 ui_print("----");

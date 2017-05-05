@@ -1,7 +1,13 @@
 # Integrated App Zipper
 # Environment Variables
 DEVICE_MODEL=Z00A
-ROM=Lineage
+# Pass 'MLA' to Build Mini Version
+if [[ "$1" == "MLA" ]]
+then
+	ROM=Lineage_Mini
+else
+	ROM=Lineage
+fi
 BREAKFAST=y
 JBS=24
 DATE=$(date +"%m%d%y")
@@ -36,8 +42,21 @@ rm -rf tools/IAZ/packaging
 }
 
 # App Build Lists
-AOSPAPPS="<insert aosp apps here>"
-ROMAPPS="<insert rom specific apps here>"
+AOSPAPPS="Calendar \
+		Email \
+		PacProcessor \
+		EasterEgg \
+		Gallery2"
+
+ROMAPPS="Development \
+		Profiles \
+		LiveWallpapersPicker \
+		PhotoTable \
+		AudioFX \
+		Eleven \
+		Trebuchet \
+		Stk \
+		Recorder"
 
 # Da Script
 printf "######### Command Acknowledged #########\n"
@@ -66,9 +85,15 @@ then
 		breakfast $DEVICE_MODEL
 	fi
 
-	mka -j$JBS \
-	$AOSPAPPS \
-	$ROMAPPS
+	if [[ "$1" != "MLA" ]]
+	then
+		mka -j$JBS \
+		$AOSPAPPS \
+		$ROMAPPS
+	else
+		mka -j$JBS \
+		$AOSPAPPS
+	fi
 	printf "\n######### Apps Compiled #########\n"
 	pack
 	printf "\n######### Zip Compiled #########\n"
