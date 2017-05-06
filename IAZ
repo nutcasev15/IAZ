@@ -5,6 +5,8 @@ ROM=<yourrom>
 BREAKFAST=n
 JBS=16
 DATE=$(date +"%m%d%Y")
+SYSDIR=$(find out -type d -name "system" | grep $DEVICE_MODEL)
+JAVADIR=$(find out -type d -name "JAVA_LIBRARIES" | grep $DEVICE_MODEL)
 # Export PONLY in ROM Src ROOT for Zipping only
 # Begin
 
@@ -30,9 +32,20 @@ printf "######### Command Acknowledged #########\n"
 if [[ -z "$PONLY" ]]
 then
 	printf "\n######### Setting Up Environtment #########\n"
-	printf "\n######### Updating App Sources #########\n"
+	if [[ "$JAVADIR" != "" && "$SYSDIR" != "" ]]
+	then
+	rm -rf $SYSDIR
+	elif [[ "$SYSDIR" != "" ]]
+	then
+	rm -rf out
+	elif [[ -e out/syncsave ]]
+	then
+	printf "\n######### Ready #########\n"
+	else
 	repo sync -qj$JBS
+	echo 1 > out/syncsave
 	printf "\n######### Done Syncing #########\n"
+	fi
 	. build/envsetup.sh
 	if [[ "$BREAKFAST" == "n" ]]
 	then
@@ -40,7 +53,7 @@ then
 	else
 		breakfast $DEVICE_MODEL
 	fi
-	make clean
+
 	mka -j$JBS \
 	$AOSPAPPS \
 	$ROMAPPS
@@ -52,5 +65,5 @@ else
 	printf "\n######### Zip Compiled #########\n"
 fi
 
-unset DEVICE_MODEL ROM BREAKFAST JBS DATE AOSPAPPS ROMAPPS
+unset DEVICE_MODEL ROM BREAKFAST JBS DATE AOSPAPPS ROMAPPS JAVADIR SYSDIR
 # End
