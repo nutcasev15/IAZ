@@ -5,21 +5,22 @@ ROM=<yourrom>
 BREAKFAST=n
 JBS=16
 DATE=$(date +"%m%d%Y")
-SYSDIR=$(find out -type d -name "system" | grep $DEVICE_MODEL)
-JAVADIR=$(find out -type d -name "JAVA_LIBRARIES" | grep $DEVICE_MODEL)
-# Export PONLY in ROM Src ROOT for Zipping only
+SYSDIR="$(find out -type d -name "system" | grep $DEVICE_MODEL)"
+JAVADIR="$(find out -type d -name "JAVA_LIBRARIES")"
+# Pass 'pack' to Script for Zipping only
 # Begin
 
 # Packing Method
 pack(){
-SYSDIR=$(find out -type d -name "system" | grep $DEVICE_MODEL)
-cp -ar $SYSDIR tools/IAZ
-cd tools/IAZ
-chmod -R 644 system
-find . -type f -exec zip "$ROM"_AppSuite_"$DATE".zip {} +
-rm -rf system
-cd ../..
-mv tools/IAZ/"$ROM"_AppSuite_"$DATE".zip ../"$ROM"_AppSuite_"$DATE".zip
+SYSDIR="$(find out -type d -name "system" | grep $DEVICE_MODEL)"
+sudo cp -ar $SYSDIR/app tools/IAZ/packaging/system/app
+sudo cp -ar $SYSDIR/priv-app tools/IAZ/packaging/system/priv-app
+cd tools/IAZ/packaging
+sudo chmod -R 644 system
+sudo find . -type f -exec zip "$ROM"_AppSuite_"$DATE".zip {} +
+cd ../../..
+sudo mv tools/IAZ/packaging/"$ROM"_AppSuite_"$DATE".zip ../"$ROM"_AppSuite_"$DATE".zip
+rm -rf tools/IAZ/packaging
 unset SYSDIR
 }
 
@@ -29,21 +30,20 @@ ROMAPPS="<insert rom specific apps here>"
 
 # Da Script
 printf "######### Command Acknowledged #########\n"
-if [[ -z "$PONLY" ]]
+if [[ "$1" != "pack" ]]
 then
 	printf "\n######### Setting Up Environtment #########\n"
-	if [[ "$JAVADIR" != "" && "$SYSDIR" != "" ]]
+	if [[ "$JAVADIR" != "" ]]
 	then
-	rm -rf $SYSDIR
-	elif [[ "$SYSDIR" != "" ]]
-	then
-	rm -rf out
+	rm -rf $SYSDIR\*app
 	elif [[ -e out/syncsave ]]
 	then
+	rm -rf out/target
 	printf "\n######### Ready #########\n"
 	else
 	repo sync -qj$JBS
 	echo 1 > out/syncsave
+	make clean
 	printf "\n######### Done Syncing #########\n"
 	fi
 	. build/envsetup.sh
