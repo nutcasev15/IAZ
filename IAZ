@@ -5,23 +5,30 @@ ROM=<yourrom>
 BREAKFAST=n
 JBS=16
 DATE=$(date +"%m%d%Y")
-SYSDIR="$(find out -type d -name "system" | grep $DEVICE_MODEL)"
+SYSDIR="out/target/product/$DEVICE_MODEL/system"
 JAVADIR="$(find out -type d -name "JAVA_LIBRARIES")"
 # Pass 'pack' to Script for Zipping only
 # Begin
 
 # Packing Method
-pack(){
-SYSDIR="$(find out -type d -name "system" | grep $DEVICE_MODEL)"
-sudo cp -ar $SYSDIR/app tools/IAZ/packaging/system/app
-sudo cp -ar $SYSDIR/priv-app tools/IAZ/packaging/system/priv-app
-cd tools/IAZ/packaging
-sudo chmod -R 644 system
-sudo find . -type f -exec zip "$ROM"_AppSuite_"$DATE".zip {} +
-cd ../../..
-sudo mv tools/IAZ/packaging/"$ROM"_AppSuite_"$DATE".zip ../"$ROM"_AppSuite_"$DATE".zip
+pack() {
+HOSTDIR="out/target/product/$DEVICE_MODEL/"
 rm -rf tools/IAZ/packaging
-unset SYSDIR
+mkdir tools/IAZ/packaging tools/IAZ/packaging/system tools/IAZ/packaging/system/lib
+cd $HOSTDIR
+cp -HR system/app ../../../../tools/IAZ/packaging/system
+cp -HR system/priv-app ../../../../tools/IAZ/packaging/system/
+cd system/lib
+cp $(ls -a | grep 'jni') ../../../../../../tools/IAZ/packaging/system/lib
+cd ../../../../../..
+cp -R tools/IAZ/META-INF tools/IAZ/packaging/META-INF
+cd tools/IAZ/packaging
+chmod -R 644 system
+find . -exec zip --symlinks "$ROM"_AppSuite_"$DATE".zip {} +
+cd ../../..
+mv tools/IAZ/packaging/"$ROM"_AppSuite_"$DATE".zip ../"$ROM"_AppSuite_"$DATE".zip
+rm -rf tools/IAZ/packaging
+unset HOSTDIR
 }
 
 # App Build Lists
@@ -30,12 +37,14 @@ ROMAPPS="<insert rom specific apps here>"
 
 # Da Script
 printf "######### Command Acknowledged #########\n"
+printf " \n\n Packing Method Requires Call to be from sudo -s Terminal\n\n"
+sleep 3
 if [[ "$1" != "pack" ]]
 then
 	printf "\n######### Setting Up Environtment #########\n"
 	if [[ "$JAVADIR" != "" ]]
 	then
-	rm -rf $SYSDIR\*app
+	rm -rf $SYSDIR
 	elif [[ -e out/syncsave ]]
 	then
 	rm -rf out/target
