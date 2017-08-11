@@ -3,32 +3,36 @@
 DEVICE_MODEL=<yourmodel>
 ROM=<yourrom>
 BREAKFAST=n
-JBS=16
+JBS=22
 DATE=$(date +"%m%d%Y")
-SYSDIR="out/target/product/$DEVICE_MODEL/system"
-JAVADIR="$(find out -type d -name "JAVA_LIBRARIES")"
+export ROM_ROOT=$PWD
+export SYSDIR="out/target/product/$DEVICE_MODEL/system"
+export JAVADIR="$(find out -type d -name "JAVA_LIBRARIES")"
 # Pass 'pack' to Script for Zipping only
 # Begin
 
 # Packing Method
 pack() {
-HOSTDIR="out/target/product/$DEVICE_MODEL/"
 rm -rf tools/IAZ/packaging
-mkdir tools/IAZ/packaging tools/IAZ/packaging/system tools/IAZ/packaging/system/lib
-cd $HOSTDIR
-cp -HR system/app ../../../../tools/IAZ/packaging/system
-cp -HR system/priv-app ../../../../tools/IAZ/packaging/system/
-cd system/lib
-cp $(ls -a | grep 'jni') ../../../../../../tools/IAZ/packaging/system/lib
-cd ../../../../../..
-cp -R tools/IAZ/META-INF tools/IAZ/packaging/META-INF
+mkdir tools/IAZ/packaging tools/IAZ/packaging/system
+
+# Remap Symlinks
+
+cd $SYSDIR/app
+find . -name "*.so" -execdir bash -c 'rm -f $(basename {}) && ln -s $ROM_ROOT/$SYSDIR/lib/$(basename {}) $(basename {})' ';'
+cd ../priv-app
+find . -name "*.so" -execdir bash -c 'rm -f $(basename {}) && ln -s $ROM_ROOT/$SYSDIR/lib/$(basename {}) $(basename {})' ';'
+cd ..
+
+cp -arL app $ROM_ROOT/tools/IAZ/packaging/system
+cp -arL priv-app $ROM_ROOT/tools/IAZ/packaging/system/
+cd $ROM_ROOT
+cp -ar tools/IAZ/META-INF tools/IAZ/packaging/META-INF
 cd tools/IAZ/packaging
-chmod -R 644 system
-find . -exec zip --symlinks "$ROM"_AppSuite_"$DATE".zip {} +
-cd ../../..
+find . -exec zip "$ROM"_AppSuite_"$DATE".zip {} +
+cd $ROM_ROOT
 mv tools/IAZ/packaging/"$ROM"_AppSuite_"$DATE".zip ../"$ROM"_AppSuite_"$DATE".zip
 rm -rf tools/IAZ/packaging
-unset HOSTDIR
 }
 
 # App Build Lists
@@ -37,7 +41,6 @@ ROMAPPS="<insert rom specific apps here>"
 
 # Da Script
 printf "######### Command Acknowledged #########\n"
-printf " \n\n Packing Method Requires Call to be from sudo -s Terminal\n\n"
 sleep 3
 if [[ "$1" != "pack" ]]
 then
@@ -74,5 +77,5 @@ else
 	printf "\n######### Zip Compiled #########\n"
 fi
 
-unset DEVICE_MODEL ROM BREAKFAST JBS DATE AOSPAPPS ROMAPPS JAVADIR SYSDIR
+unset DEVICE_MODEL ROM BREAKFAST JBS DATE AOSPAPPS ROMAPPS JAVADIR SYSDIR ROM_ROOT
 # End
