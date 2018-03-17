@@ -77,5 +77,6 @@ else
 	printf "\n######### Zip Compiled #########\n"
 fi
 
+./prebuilts/sdk/tools/jack-admin stop-server
 unset DEVICE_MODEL ROM BREAKFAST JBS DATE AOSPAPPS ROMAPPS JAVADIR SYSDIR ROM_ROOT
 # End
